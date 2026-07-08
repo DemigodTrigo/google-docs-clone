@@ -1,6 +1,7 @@
 package com.docs.common.exception;
 
 import com.docs.common.response.ApiResponse;
+import com.docs.common.response.ErrorResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
@@ -8,6 +9,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -19,16 +21,6 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ApiResponse.failure(ex.getMessage()));
     }
 
-    @ExceptionHandler(BadRequestException.class)
-    public ResponseEntity<ApiResponse<Object>> handleBadRequestException(BadRequestException ex) {
-        return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
-                .body(
-                        ApiResponse.failure(
-                                ex.getMessage()
-                        )
-                );
-    }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<Object>>
@@ -46,6 +38,27 @@ public class GlobalExceptionHandler {
                                 "Something went wrong"
                         )
                 );
+    }
+
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<ErrorResponse> handleBadRequest(
+
+            BadRequestException exception
+
+    ){
+
+        ErrorResponse response =
+                new ErrorResponse(
+                        false,
+                        exception.getMessage(),
+                        LocalDateTime.now()
+                );
+
+
+        return ResponseEntity
+                .badRequest()
+                .body(response);
+
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
